@@ -4,9 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,25 +17,23 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cosc.bandfanapp.R;
+import com.cosc.bandfanapp.model.User;
+import com.cosc.bandfanapp.task.LoginTask;
+import com.cosc.bandfanapp.util.ErrorCode;
+import com.orm.SugarRecord;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements LoginTask.LoginListener {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private LoginTask mLoginTask = null;
 
     // UI references.
     private EditText mUsernameView;
@@ -45,6 +45,11 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Check if there is already logged in
+        if (SugarRecord.count(User.class) > 1) {
+            // Jump to main screen
+        }
 
         mUsernameView = (EditText) findViewById(R.id.username);
 
@@ -72,7 +77,7 @@ public class LoginActivity extends Activity {
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                startRegisterActivity();
             }
         });
 
@@ -86,7 +91,7 @@ public class LoginActivity extends Activity {
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
+        if (mLoginTask != null) {
             return;
         }
 
@@ -102,14 +107,14 @@ public class LoginActivity extends Activity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check if user has entered a username
-        if (!TextUtils.isEmpty(username)) {
+        if (TextUtils.isEmpty(username)) {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
             cancel = true;
@@ -123,13 +128,9 @@ public class LoginActivity extends Activity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            mLoginTask = new LoginTask(username, password, this);
+            mLoginTask.execute((Void) null);
         }
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 5;
     }
 
     /**
@@ -168,61 +169,69 @@ public class LoginActivity extends Activity {
         }
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private void startRegisterActivity() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
+    }
 
-        private final String mEmail;
-        private final String mPassword;
+    @Override
+    public void loginSuccessful(final User user) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLoginTask = null;
+                showProgress(false);
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
+                // TODO: TESTING
+                Toast.makeText(LoginActivity.this, "User Id: " + user.getId(), Toast.LENGTH_LONG).show();
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+                user.setPassword(mPasswordView.getText().toString());
+                user.save();
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+                //finish();
             }
+        });
+    }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+    @Override
+    public void loginFailed(final ErrorCode code) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLoginTask = null;
+                showProgress(false);
+
+                if (code.errorCode == ErrorCode.Code.GENERIC_ERROR) {
+
+                }
+                if (code.errorCode == ErrorCode.Code.USER_GENERIC_ERROR) {
+
+                }
+                if (code.errorCode == ErrorCode.Code.USERNAME_INVALID) {
+                    mUsernameView.setError(getString(R.string.error_incorrect_username));
+                    mUsernameView.requestFocus();
+                }
+                if (code.errorCode == ErrorCode.Code.PASSWORD_INVALID) {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
                 }
             }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+        });
     }
+
+    @Override
+    public void loginCanceled() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLoginTask = null;
+                showProgress(false);
+            }
+        });
+    }
+
 }
 
