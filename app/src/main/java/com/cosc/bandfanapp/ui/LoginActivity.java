@@ -47,8 +47,8 @@ public class LoginActivity extends Activity implements LoginTask.LoginListener {
         setContentView(R.layout.activity_login);
 
         // Check if there is already logged in
-        if (SugarRecord.count(User.class) > 1) {
-            // Jump to main screen
+        if (SugarRecord.count(User.class) > 0) {
+            //startMainActivity();
         }
 
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -172,6 +172,13 @@ public class LoginActivity extends Activity implements LoginTask.LoginListener {
     private void startRegisterActivity() {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override
