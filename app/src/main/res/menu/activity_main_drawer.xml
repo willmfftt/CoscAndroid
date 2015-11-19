@@ -6,6 +6,9 @@
             <item
                 android:id="@+id/nav_create_band"
                 android:title="Create Band" />
+            <item
+                android:id="@+id/nav_create_band_member"
+                android:title="Create Band Member" />
         </menu>
     </item>
 
