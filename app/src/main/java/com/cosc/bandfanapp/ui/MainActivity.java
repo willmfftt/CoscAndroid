@@ -1,6 +1,5 @@
 package com.cosc.bandfanapp.ui;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -24,7 +23,7 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
-        , CreateBandFragment.OnFragmentInteractionListener {
+        , OnFragmentInteractionListener {
 
     private User mCurrentUser;
 
@@ -63,6 +62,8 @@ public class MainActivity extends AppCompatActivity
             TextView email = (TextView) header.findViewById(R.id.email);
             email.setText(mCurrentUser.getEmail());
         }
+
+        setDefaultFragment();
     }
 
     @Override
@@ -103,11 +104,15 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        FragmentManager fm = getSupportFragmentManager();
+
         if (id == R.id.nav_create_band) {
-            FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();
-            transaction.add(R.id.content_main, CreateBandFragment.newInstance());
+            transaction.replace(R.id.content_main, CreateBandFragment.newInstance());
             transaction.commit();
+        }
+        if (id == R.id.nav_view_bands) {
+            setDefaultFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -116,10 +121,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onFragmentInteraction() {
+        setDefaultFragment();
+    }
+
+    private void setDefaultFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.remove(fm.getFragments().get(0));
+        transaction.replace(R.id.content_main, ListBandsFragment.newInstance());
         transaction.commit();
     }
 

@@ -1,7 +1,6 @@
 package com.cosc.bandfanapp.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -21,7 +20,7 @@ import com.cosc.bandfanapp.task.CreateBandTask;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link CreateBandFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link CreateBandFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -91,19 +90,19 @@ public class CreateBandFragment extends Fragment {
                 }
 
                 String dateStart = String.valueOf(mDateStartPicker.getYear()) + "-"
-                        + mDateStartPicker.getMonth() + "-" + mDateStartPicker.getDayOfMonth();
+                        + (mDateStartPicker.getMonth() + 1) + "-" + mDateStartPicker.getDayOfMonth();
 
                 mTask = new CreateBandTask(name, dateStart, new CreateBandTask.CreateBandListener() {
                     @Override
                     public void onBandCreated(Band band) {
                         mTask = null;
-                        mListener.onFragmentInteraction(null);
+                        mListener.onFragmentInteraction();
                     }
 
                     @Override
                     public void onBandCreateFailed() {
                         mTask = null;
-                        mListener.onFragmentInteraction(null);
+                        mListener.onFragmentInteraction();
                     }
                 });
 
@@ -111,7 +110,7 @@ public class CreateBandFragment extends Fragment {
             }
         }
         if (id == R.id.menu_cancel) {
-            mListener.onFragmentInteraction(null);
+            mListener.onFragmentInteraction();
         }
 
         return super.onOptionsItemSelected(item);
@@ -134,18 +133,4 @@ public class CreateBandFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }

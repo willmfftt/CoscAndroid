@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item android:id="@+id/nav_view_bands"
+        android:title="View Bands" />
+
     <item android:title="Moderator">
         <menu>
             <item
                 android:id="@+id/nav_create_band"
                 android:title="Create Band" />
+            <item
+                android:id="@+id/nav_create_band_member"
+                android:title="Create Band Member" />
         </menu>
     </item>
 
