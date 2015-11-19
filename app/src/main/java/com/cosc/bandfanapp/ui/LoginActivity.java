@@ -17,7 +17,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cosc.bandfanapp.R;
 import com.cosc.bandfanapp.model.User;
@@ -48,7 +47,7 @@ public class LoginActivity extends Activity implements LoginTask.LoginListener {
 
         // Check if there is already logged in
         if (SugarRecord.count(User.class) > 0) {
-            //startMainActivity();
+            startMainActivity();
         }
 
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -190,13 +189,10 @@ public class LoginActivity extends Activity implements LoginTask.LoginListener {
                 mLoginTask = null;
                 showProgress(false);
 
-                // TODO: TESTING
-                Toast.makeText(LoginActivity.this, "User Id: " + user.getId(), Toast.LENGTH_LONG).show();
-
                 user.setPassword(mPasswordView.getText().toString());
                 user.save();
 
-                //finish();
+                startMainActivity();
             }
         });
     }
