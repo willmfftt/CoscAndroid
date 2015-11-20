@@ -39,4 +39,10 @@ public class RestServiceProvider {
         return retrofit.create(BandService.class);
     }
 
+    public static BandMemberService getBandMemberService() {
+        Retrofit retrofit = getRetrofit();
+
+        return retrofit.create(BandMemberService.class);
+    }
+
 }

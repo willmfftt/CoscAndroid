@@ -114,6 +114,11 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_view_bands) {
             setDefaultFragment();
         }
+        if (id == R.id.nav_create_band_member) {
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.replace(R.id.content_main, CreateBandMemberFragment.newInstance());
+            transaction.commit();
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
