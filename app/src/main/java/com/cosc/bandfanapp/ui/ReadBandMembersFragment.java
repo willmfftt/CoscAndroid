@@ -5,19 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.cosc.bandfanapp.R;
-import com.cosc.bandfanapp.adapter.BandListAdapter;
-import com.cosc.bandfanapp.network.model.band.Band;
-import com.cosc.bandfanapp.task.GetBandsTask;
+import com.cosc.bandfanapp.adapter.BandMemberListAdapter;
+import com.cosc.bandfanapp.model.BandMember;
+import com.cosc.bandfanapp.task.ReadBandMembersTask;
 
 import java.util.List;
 
@@ -26,20 +23,23 @@ import java.util.List;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ListBandsFragment#newInstance} factory method to
+ * Use the {@link ReadBandMembersFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListBandsFragment extends Fragment {
+public class ReadBandMembersFragment extends Fragment {
+
+    private static final String BAND_ID = "band_id";
 
     private OnFragmentInteractionListener mListener;
+    private int mBandId;
 
-    private ListView mListView;
-    private BandListAdapter mAdapter;
     private ProgressBar mProgressBar;
+    private ListView mListView;
+    private BandMemberListAdapter mAdapter;
 
-    private GetBandsTask mTask;
+    private ReadBandMembersTask mTask;
 
-    public ListBandsFragment() {
+    public ReadBandMembersFragment() {
         // Required empty public constructor
     }
 
@@ -47,39 +47,36 @@ public class ListBandsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment ListBandsFragment.
+     * @return A new instance of fragment ReadBandMembersFragment.
      */
-    public static ListBandsFragment newInstance() {
-        return new ListBandsFragment();
+    // TODO: Rename and change types and number of parameters
+    public static ReadBandMembersFragment newInstance(int bandId) {
+        ReadBandMembersFragment fragment = new ReadBandMembersFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(BAND_ID, bandId);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            mBandId = getArguments().getInt(BAND_ID);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_list_bands, container, false);
+        View v = inflater.inflate(R.layout.fragment_read_band_members, container, false);
 
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mAdapter != null) {
-                    Band band = mAdapter.getItem(i);
-
-                    FragmentManager fm = getActivity().getSupportFragmentManager();
-                    FragmentTransaction transaction = fm.beginTransaction();
-                    transaction.replace(R.id.content_main, ReadBandMembersFragment.newInstance(band.id));
-                    transaction.addToBackStack(null);
-                    transaction.commit();
-                }
-            }
-        });
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+        mListView = (ListView) v.findViewById(R.id.list_view);
+
+        initialize();
 
         return v;
     }
@@ -101,45 +98,38 @@ public class ListBandsFragment extends Fragment {
         mListener = null;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        initialize();
-    }
-
     private void initialize() {
         if (mTask == null) {
             showProgressBar(true);
-
-            mTask = new GetBandsTask(new GetBandsTask.OnGetBandsResponseListener() {
+            mTask = new ReadBandMembersTask(mBandId
+                    , new ReadBandMembersTask.OnReadBandMembersListener() {
                 @Override
-                public void onGetBandsResponse(final List<Band> bands) {
+                public void onReadBandMembers(final List<BandMember> bandMembers) {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mTask = null;
-                            mAdapter = new BandListAdapter(getContext(), bands);
-                            mListView.setAdapter(mAdapter);
                             showProgressBar(false);
+                            mTask = null;
+                            mAdapter = new BandMemberListAdapter(getContext(), bandMembers);
+                            mListView.setAdapter(mAdapter);
                         }
                     });
                 }
 
                 @Override
-                public void onGetBandsFailure() {
+                public void onReadBandMembersFailure() {
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mTask = null;
                             showProgressBar(false);
+                            mTask = null;
+                            mListener.onFragmentInteraction();
                         }
                     });
                 }
             });
-
             mTask.execute((Void) null);
         }
     }

@@ -7,4 +7,7 @@ import com.cosc.bandfanapp.network.model.Response;
  * @version 1.0 11/18/15
  */
 public class CreateBandMemberResponse extends Response {
+
+    public int id;
+
 }
