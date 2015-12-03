@@ -44,6 +44,8 @@ public class CreateBandMemberFragment extends Fragment {
     private EditText mLastName;
     private DatePicker mDateStart;
 
+    private Context mContext;
+
     private CreateBandMemberTask mTask;
 
     private List<Band> mBands;
@@ -66,6 +68,8 @@ public class CreateBandMemberFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mContext = getContext();
 
         setHasOptionsMenu(true);
     }
@@ -148,12 +152,6 @@ public class CreateBandMemberFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     private void initialize() {
         showProgressBar(true);
 
@@ -170,7 +168,7 @@ public class CreateBandMemberFragment extends Fragment {
                         for (Band band : bands) {
                             bandNames.add(band.name);
                         }
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext()
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(mContext
                                 , android.R.layout.simple_spinner_dropdown_item, bandNames);
                         mSpinner.setAdapter(adapter);
                     }

@@ -37,6 +37,8 @@ public class ReadBandMembersFragment extends Fragment {
     private ListView mListView;
     private BandMemberListAdapter mAdapter;
 
+    private Context mContext;
+
     private ReadBandMembersTask mTask;
 
     public ReadBandMembersFragment() {
@@ -61,6 +63,8 @@ public class ReadBandMembersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mContext = getContext();
 
         if (getArguments() != null) {
             mBandId = getArguments().getInt(BAND_ID);
@@ -92,12 +96,6 @@ public class ReadBandMembersFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     private void initialize() {
         if (mTask == null) {
             showProgressBar(true);
@@ -111,7 +109,7 @@ public class ReadBandMembersFragment extends Fragment {
                         public void run() {
                             showProgressBar(false);
                             mTask = null;
-                            mAdapter = new BandMemberListAdapter(getContext(), bandMembers);
+                            mAdapter = new BandMemberListAdapter(mContext, bandMembers);
                             mListView.setAdapter(mAdapter);
                         }
                     });
