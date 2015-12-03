@@ -38,6 +38,7 @@ public class ListBandsFragment extends Fragment {
     private ProgressBar mProgressBar;
 
     private GetBandsTask mTask;
+    private Context mContext;
 
     public ListBandsFragment() {
         // Required empty public constructor
@@ -56,6 +57,8 @@ public class ListBandsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mContext = getContext();
     }
 
     @Override
@@ -96,12 +99,6 @@ public class ListBandsFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
 
@@ -120,7 +117,7 @@ public class ListBandsFragment extends Fragment {
                         @Override
                         public void run() {
                             mTask = null;
-                            mAdapter = new BandListAdapter(getContext(), bands);
+                            mAdapter = new BandListAdapter(mContext, bands);
                             mListView.setAdapter(mAdapter);
                             showProgressBar(false);
                         }
