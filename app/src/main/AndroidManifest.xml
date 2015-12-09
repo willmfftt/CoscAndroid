@@ -42,7 +42,8 @@
             android:label="@string/app_name" />
         <activity
             android:name=".ui.ReadBandMembersActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:parentActivityName=".ui.ListBandsActivity"/>
 
         <meta-data
             android:name="DATABASE"

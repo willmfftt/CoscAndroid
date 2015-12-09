@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +34,7 @@ public class CreateBandMemberActivity extends AppCompatActivity {
     private DatePicker mDateStart;
 
     private Context mContext;
+    private NavController mNavController;
 
     private CreateBandMemberTask mTask;
 
@@ -43,6 +45,11 @@ public class CreateBandMemberActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_band_member);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mNavController = new NavController(this, toolbar);
+
         mContext = this;
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -52,6 +59,13 @@ public class CreateBandMemberActivity extends AppCompatActivity {
         mDateStart = (DatePicker) findViewById(R.id.date_start);
 
         initialize();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!mNavController.onBackPressed()) {
+            super.onBackPressed();
+        }
     }
 
     @Override
