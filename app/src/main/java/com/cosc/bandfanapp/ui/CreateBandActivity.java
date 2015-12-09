@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,15 +23,29 @@ public class CreateBandActivity extends AppCompatActivity {
     private EditText mNameEditText;
     private DatePicker mDateStartPicker;
 
+    private NavController mNavController;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_band);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mNavController = new NavController(this, toolbar);
+
         mNameEditText = (EditText) findViewById(R.id.name);
         mNameEditText.setError(null);
 
         mDateStartPicker = (DatePicker) findViewById(R.id.date_start);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!mNavController.onBackPressed()) {
+            super.onBackPressed();
+        }
     }
 
     @Override
