@@ -4,15 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -26,17 +24,7 @@ import com.cosc.bandfanapp.task.GetBandsTask;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CreateBandMemberFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CreateBandMemberFragment extends Fragment {
-
-    private OnFragmentInteractionListener mListener;
+public class CreateBandMemberActivity extends AppCompatActivity {
 
     private ProgressBar mProgressBar;
     private AppCompatSpinner mSpinner;
@@ -50,52 +38,29 @@ public class CreateBandMemberFragment extends Fragment {
 
     private List<Band> mBands;
 
-    public CreateBandMemberFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment CreateBandMemberFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CreateBandMemberFragment newInstance() {
-        return new CreateBandMemberFragment();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_create_band_member);
 
-        mContext = getContext();
+        mContext = this;
 
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v =  inflater.inflate(R.layout.fragment_create_band_member, container, false);
-
-        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        mSpinner = (AppCompatSpinner) v.findViewById(R.id.spinner);
-        mFirstName = (EditText) v.findViewById(R.id.first_name);
-        mLastName = (EditText) v.findViewById(R.id.last_name);
-        mDateStart = (DatePicker) v.findViewById(R.id.date_start);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mSpinner = (AppCompatSpinner) findViewById(R.id.spinner);
+        mFirstName = (EditText) findViewById(R.id.first_name);
+        mLastName = (EditText) findViewById(R.id.last_name);
+        mDateStart = (DatePicker) findViewById(R.id.date_start);
 
         initialize();
-
-        return v;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         menu.clear();
-        inflater.inflate(R.menu.fragment_create_band_member, menu);
+        inflater.inflate(R.menu.activity_create_band_member, menu);
+
+        return true;
     }
 
     @Override
@@ -119,37 +84,38 @@ public class CreateBandMemberFragment extends Fragment {
                                     , new CreateBandMemberTask.OnCreateBandMemberListener() {
                                 @Override
                                 public void onCreateBandMember(int id) {
-                                    mListener.onFragmentInteraction();
+                                    Handler handler = new Handler(Looper.getMainLooper());
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            finish();
+                                        }
+                                    });
                                 }
 
                                 @Override
                                 public void onCreateBandMemberFailure() {
-                                    mListener.onFragmentInteraction();
+                                    Handler handler = new Handler(Looper.getMainLooper());
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            finish();
+                                        }
+                                    });
                                 }
                             });
                             mTask.execute((Void) null);
                         }
                     }
                 }
-                mListener.onFragmentInteraction();
+                finish();
                 break;
             case R.id.menu_cancel:
-                mListener.onFragmentInteraction();
+                finish();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     private void initialize() {
@@ -182,7 +148,7 @@ public class CreateBandMemberFragment extends Fragment {
                     @Override
                     public void run() {
                         showProgressBar(false);
-                        mListener.onFragmentInteraction();
+                        finish();
                     }
                 });
             }

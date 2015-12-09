@@ -30,9 +30,19 @@
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.CreateBandActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme" />
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+        <activity
+            android:name=".ui.CreateBandMemberActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+        <activity
+            android:name=".ui.ListBandsActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".ui.ReadBandMembersActivity"
+            android:label="@string/app_name" />
 
         <meta-data
             android:name="DATABASE"
