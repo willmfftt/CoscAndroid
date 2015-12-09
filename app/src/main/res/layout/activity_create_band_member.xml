@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.cosc.bandfanapp.ui.CreateBandMemberFragment">
+    tools:context=".ui.CreateBandMemberActivity">
 
     <TextView
         style="?android:attr/textAppearanceLarge"
